@@ -1,0 +1,78 @@
+[build-system]
+requires = ["hatchling>=1.27"]
+build-backend = "hatchling.build"
+
+[project]
+name = "icloud-caldav-mcp"
+version = "0.1.0"
+description = "Authenticated FastMCP server for full-featured iCloud Calendar management over CalDAV"
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [{ name = "caldav-mcp contributors" }]
+dependencies = [
+  "caldav>=2.1,<3",
+  "fastmcp>=3.2.4,<4",
+  "icalendar>=6.3,<7",
+  "python-dateutil>=2.9,<3",
+  "python-dotenv>=1.1,<2",
+  "recurring-ical-events>=3.8,<4",
+  "structlog>=25.4,<26",
+  "tzdata>=2025.2",
+]
+
+[project.optional-dependencies]
+dev = [
+  "httpx>=0.28,<1",
+  "mypy>=1.17,<2",
+  "pytest>=8.4,<9",
+  "pytest-asyncio>=1.1,<2",
+  "pytest-cov>=6.2,<7",
+  "radicale>=3.5,<4",
+  "ruff>=0.12,<1",
+  "types-python-dateutil>=2.9,<3",
+]
+
+[project.scripts]
+icloud-caldav-mcp = "icloud_caldav_mcp.__main__:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/icloud_caldav_mcp"]
+
+[tool.pytest.ini_options]
+addopts = "-ra --strict-markers"
+testpaths = ["tests"]
+markers = [
+  "integration: starts a loopback Radicale server",
+  "icloud: read-only manual smoke against the configured iCloud account",
+]
+asyncio_mode = "auto"
+filterwarnings = [
+  "ignore:Using `httpx` with `starlette.testclient` is deprecated",
+]
+
+[tool.ruff]
+target-version = "py311"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "SIM", "RUF", "ASYNC", "S"]
+ignore = ["S101"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["S101", "S105", "S106"]
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+packages = ["icloud_caldav_mcp"]
+warn_unused_ignores = false
+plugins = ["pydantic.mypy"]
+
+[[tool.mypy.overrides]]
+module = "icloud_caldav_mcp.service"
+disallow_untyped_calls = false
+
+[[tool.mypy.overrides]]
+module = ["caldav", "caldav.*", "icalendar", "icalendar.*"]
+ignore_missing_imports = true
