@@ -1,10 +1,9 @@
 # State
 
-- Current phase: 0
-- Cycle: 1
-- Last pushed hash: none
+- Current phase: 3
+- Cycle: 2
+- Last pushed hash: b5fe55f12f52e10cd06a9e5af32389ed40181206
 - Working branch: main
-- Item in progress: P0-01 bootstrap authenticated Streamable HTTP server and CalDAV foundation
+- Item in progress: P3-02 recurrence REPORT fallback for iCloud-compatible servers
 - Build/test status: IN PROGRESS
-- Recent-cycle tiers: HIGH
-
+- Recent-cycle tiers: HIGH, HIGH

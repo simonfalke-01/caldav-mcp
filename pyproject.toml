@@ -74,5 +74,12 @@ module = "icloud_caldav_mcp.service"
 disallow_untyped_calls = false
 
 [[tool.mypy.overrides]]
-module = ["caldav", "caldav.*", "icalendar", "icalendar.*"]
+module = [
+  "caldav",
+  "caldav.*",
+  "icalendar",
+  "icalendar.*",
+  "recurring_ical_events",
+  "recurring_ical_events.*",
+]
 ignore_missing_imports = true

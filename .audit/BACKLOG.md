@@ -21,13 +21,18 @@
 
 ## IN PROGRESS
 
-- [P0-01] Authenticated Streamable HTTP and CalDAV bootstrap.
+- [P3-02] Fall back from rejected server-side recurrence expansion to local RFC 5545 expansion.
 
 ## DONE
 
 - Repository initialized on `main` with the operator-provided `origin`.
+- [P0-01] Authenticated Streamable HTTP, Radicale, Inspector, CI, container, and documentation.
+- [P1-01] Core event CRUD, agenda, search, strict validation, conflicts, and optimistic sequence checks.
+- [P2-01] Recurrence exceptions, EXDATE deletion, alarms, attendees, organizer, and invite response.
+- [P2-02] Move, free/busy, conflict detection, and free-slot finding.
+- [P2-03] Conservative natural-language quick-add with mutation preview.
+- [P3-01] Calendar administration/color, ICS portability, idempotency, and batch operations.
 
 ## OPEN QUESTIONS
 
 - Real-iCloud smoke verification requires operator-provided credentials and is skipped safely when absent.
-

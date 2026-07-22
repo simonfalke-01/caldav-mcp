@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+import caldav
 import pytest
+from caldav import error as caldav_error
 
 from icloud_caldav_mcp.errors import ConflictError
 from icloud_caldav_mcp.models import (
@@ -24,6 +26,41 @@ from icloud_caldav_mcp.models import (
     UpdateEventInput,
 )
 from icloud_caldav_mcp.service import CalendarService
+
+
+@pytest.mark.integration
+def test_recurrence_report_falls_back_to_local_expansion(
+    caldav_service: CalendarService, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    calendar_id = caldav_service.list_calendars()["calendars"][0]["calendar_id"]
+    created = caldav_service.create_event(
+        CreateEventInput(
+            summary="Fallback recurrence",
+            start="2026-10-05T09:00:00+08:00",
+            calendar=calendar_id,
+            rrule="FREQ=WEEKLY;COUNT=3",
+        )
+    )
+    original_search = caldav.Calendar.search
+
+    def reject_expanded_report(
+        self: caldav.Calendar, *args: object, **kwargs: object
+    ) -> list[caldav.Event]:
+        if kwargs.get("expand") is True:
+            raise caldav_error.ReportError(reason="calendar-data expansion unsupported")
+        return original_search(self, *args, **kwargs)  # type: ignore[no-any-return,arg-type]
+
+    monkeypatch.setattr(caldav.Calendar, "search", reject_expanded_report)
+    agenda = caldav_service.list_events(
+        DateRangeInput(
+            start="2026-10-01T00:00:00+08:00",
+            end="2026-10-31T00:00:00+08:00",
+            calendar=calendar_id,
+        )
+    )
+
+    assert len(agenda["events"]) == 3
+    assert {item["uid"] for item in agenda["events"]} == {created["uid"]}
 
 
 @pytest.mark.integration

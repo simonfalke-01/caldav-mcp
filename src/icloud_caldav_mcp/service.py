@@ -15,6 +15,7 @@ from uuid import NAMESPACE_URL, uuid4, uuid5
 from zoneinfo import ZoneInfo
 
 import caldav
+import recurring_ical_events
 from caldav import DAVClient
 from caldav import error as caldav_error  # type: ignore[attr-defined]
 from caldav.elements import dav as caldav_dav
@@ -236,8 +237,47 @@ class CalendarService:
         end: datetime | None,
     ) -> list[caldav.Event]:
         if start is not None and end is not None:
-            return list(calendar.search(start=start, end=end, event=True, expand=True))
+            try:
+                return list(calendar.search(start=start, end=end, event=True, expand=True))
+            except caldav_error.AuthorizationError:
+                raise
+            except (caldav_error.ReportError, caldav_error.ResponseError):
+                self._log.info(
+                    "server_recurrence_expansion_unsupported",
+                    calendar_id=self._calendar_id(calendar),
+                )
+                return list(calendar.search(start=start, end=end, event=True, expand=False))
         return list(calendar.events())
+
+    def _range_components(
+        self,
+        instance: ICalendar,
+        start: datetime | None,
+        end: datetime | None,
+        calendar_id: str,
+    ) -> list[IEvent]:
+        raw = [component for component in instance.walk("VEVENT") if isinstance(component, IEvent)]
+        if start is None or end is None:
+            return raw
+        try:
+            return [
+                component
+                for component in recurring_ical_events.of(instance).between(start, end)
+                if isinstance(component, IEvent)
+            ]
+        except Exception:
+            self._log.warning("local_recurrence_expansion_failed", calendar_id=calendar_id)
+            overlapping: list[IEvent] = []
+            for component in raw:
+                try:
+                    item_start, item_end = component_interval(
+                        component, self.settings.default_timezone
+                    )
+                except ValidationError:
+                    continue
+                if item_start < end and item_end > start:
+                    overlapping.append(component)
+            return overlapping
 
     def _events(
         self,
@@ -269,9 +309,7 @@ class CalendarService:
                         "skipping_malformed_calendar_resource", calendar_id=calendar_id
                     )
                     continue
-                for raw_component in instance.walk("VEVENT"):
-                    if not isinstance(raw_component, IEvent):
-                        continue
+                for raw_component in self._range_components(instance, start, end, calendar_id):
                     item = event_component_to_dict(
                         raw_component,
                         calendar_id=calendar_id,
