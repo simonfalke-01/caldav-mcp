@@ -27,3 +27,11 @@ the `/mcp` behavior was exercised with MCP Inspector 1.0.0 before delivery.
 the library save, yielding the intended stored value (0 for a new event, unchanged for a move).
 Updates use the library's single increment. A Radicale regression test proves 0 → 1 → 2 → 3 over
 create, master edit, occurrence edit, and occurrence delete.
+
+## 2026-07-22 — Recurrence expansion compatibility
+
+Range queries request server expansion first to reduce transfer volume. If the server rejects that
+REPORT form, the service repeats the bounded REPORT without expansion and applies
+`recurring-ical-events` locally. Local expansion is also applied defensively to returned resources,
+so behavior is consistent across servers that ignore, partially implement, or fully implement the
+expansion request.

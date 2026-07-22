@@ -21,7 +21,7 @@
 
 ## IN PROGRESS
 
-- [P3-02] Fall back from rejected server-side recurrence expansion to local RFC 5545 expansion.
+- None.
 
 ## DONE
 
@@ -32,6 +32,7 @@
 - [P2-02] Move, free/busy, conflict detection, and free-slot finding.
 - [P2-03] Conservative natural-language quick-add with mutation preview.
 - [P3-01] Calendar administration/color, ICS portability, idempotency, and batch operations.
+- [P3-02a] Rejected recurrence-expansion REPORT fallback with local RFC 5545 expansion.
 
 ## OPEN QUESTIONS
 

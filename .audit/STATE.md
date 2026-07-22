@@ -2,8 +2,8 @@
 
 - Current phase: 3
 - Cycle: 2
-- Last pushed hash: b5fe55f12f52e10cd06a9e5af32389ed40181206
+- Last pushed implementation hash: 004ad54ce5f7ce2bf04c3ba2c43c2758d72b9da4
 - Working branch: main
-- Item in progress: P3-02 recurrence REPORT fallback for iCloud-compatible servers
-- Build/test status: IN PROGRESS
+- Item in progress: none
+- Build/test status: GREEN (15 passed, 1 manual iCloud smoke skipped; Inspector and Docker green)
 - Recent-cycle tiers: HIGH, HIGH
